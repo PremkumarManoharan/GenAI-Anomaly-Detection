@@ -50,3 +50,49 @@ dmypy.json
 .vscode/
 *.swp
 *.swo
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+
+# Output of the Go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (remove the comment below if you use vendoring)
+vendor/
+
+# Go workspace file
+go.work
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+
+# Build directory
+/build/
+
+# Coverage files
+coverage.out
+
+# IDE and editor-specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Dependency management
+Gopkg.lock
+Gopkg.toml
+go.sum
+
+# OS-specific files
+.DS_Store
+
+# Environment files
+.env
