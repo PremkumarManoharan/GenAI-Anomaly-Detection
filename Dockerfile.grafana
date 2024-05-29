@@ -1,0 +1,4 @@
+FROM grafana/grafana:latest
+
+# Copy dashboards and datasources to the provisioning directory
+COPY ./provisioning /etc/grafana/provisioning

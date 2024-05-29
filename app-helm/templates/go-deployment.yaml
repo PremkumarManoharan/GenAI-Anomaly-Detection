@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-deployment
+spec:
+  replicas: {{ .Values.goBackend.replicas }}
+  selector:
+    matchLabels:
+      app: go-backend
+  template:
+    metadata:
+      labels:
+        app: go-backend
+    spec:
+      containers:
+      - name: go-backend
+        image: {{ .Values.goBackend.image }}
+        ports:
+        - containerPort: 8080
+        env:
+        - name: FASTAPI_URL
+          value: {{ .Values.goBackend.fastapiUrl }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-service
+spec:
+  selector:
+    app: go-backend
+  ports:
+    - port: 8080
+      targetPort: 8080
+  type: LoadBalancer

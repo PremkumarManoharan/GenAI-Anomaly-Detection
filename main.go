@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 )
 
 type PromptRequest struct {
@@ -27,13 +28,22 @@ type Response struct {
 }
 
 func main() {
-	http.HandleFunc("/detect", detectHandler)
-	http.Handle("/", http.FileServer(http.Dir("./static")))
+	http.HandleFunc("/detect", corsHandler(detectHandler))
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 func detectHandler(w http.ResponseWriter, r *http.Request) {
-	// Parse the request body to get the prompt
+	if r.Method == http.MethodOptions {
+		corsHandler(func(w http.ResponseWriter, r *http.Request) {})(w, r)
+		return
+	}
+
+	fastAPIURL := os.Getenv("FASTAPI_URL")
+	if fastAPIURL == "" {
+		http.Error(w, "FASTAPI_URL environment variable not set", http.StatusInternalServerError)
+		return
+	}
+
 	var promptReq PromptRequest
 	err := json.NewDecoder(r.Body).Decode(&promptReq)
 	if err != nil {
@@ -41,7 +51,6 @@ func detectHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Convert the prompt request to FastAPI request format
 	fastAPIPromptReq := FastAPIPromptRequest{Text: promptReq.Prompt}
 	jsonData, err := json.Marshal(fastAPIPromptReq)
 	if err != nil {
@@ -49,9 +58,7 @@ func detectHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Make a POST request to the FastAPI service
-	log.Println(bytes.NewBuffer(jsonData))
-	resp, err := http.Post("http://localhost:8000/detect_anomalies/", "application/json", bytes.NewBuffer(jsonData))
+	resp, err := http.Post(fastAPIURL+"/detect_anomalies/", "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
 		log.Printf("Error making request to FastAPI service: %s", err)
 		http.Error(w, "Failed to communicate with detection service", http.StatusInternalServerError)
@@ -59,14 +66,12 @@ func detectHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	// Read the response from the FastAPI service
 	responseData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		http.Error(w, "Failed to read response from detection service", http.StatusInternalServerError)
 		return
 	}
 
-	// Parse the response from the FastAPI service
 	var response Response
 	err = json.Unmarshal(responseData, &response)
 	if err != nil {
@@ -74,7 +79,18 @@ func detectHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Return the results
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
+}
+
+func corsHandler(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		if r.Method == http.MethodOptions {
+			return
+		}
+		next(w, r)
+	}
 }

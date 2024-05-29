@@ -1,0 +1,14 @@
+# Use the official Golang image as a base image
+FROM golang:1.22.3-alpine
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the go.mod and go.sum files to the working directory
+COPY go.mod main.go ./
+
+# Download all Go module dependencies
+RUN go mod download
+
+# Run the Go application
+CMD ["go", "run", "main.go"]

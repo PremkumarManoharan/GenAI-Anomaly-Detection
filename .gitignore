@@ -96,3 +96,4 @@ go.sum
 
 # Environment files
 .env
+app-helm/values.yaml

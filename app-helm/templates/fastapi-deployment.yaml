@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-deployment
+spec:
+  replicas: {{ .Values.fastapi.replicas }}
+  selector:
+    matchLabels:
+      app: fastapi
+  template:
+    metadata:
+      labels:
+        app: fastapi
+    spec:
+      containers:
+      - name: fastapi
+        image: {{ .Values.fastapi.image }}
+        ports:
+        - containerPort: {{ .Values.fastapi.port }}
+        env:
+        - name: POSTGRES_DB
+          value: {{ .Values.fastapi.env.POSTGRES_DB }}
+        - name: POSTGRES_USER
+          value: {{ .Values.fastapi.env.POSTGRES_USER }}
+        - name: POSTGRES_PASSWORD
+          value: {{ .Values.fastapi.env.POSTGRES_PASSWORD }}
+        - name: POSTGRES_HOST
+          value: {{ .Values.fastapi.env.POSTGRES_HOST }}
+        - name: POSTGRES_PORT
+          value: "{{ .Values.fastapi.env.POSTGRES_PORT }}"
+        - name: OPENAI_API_KEY
+          value: {{ .Values.fastapi.env.OPENAI_API_KEY }}
+        volumeMounts:
+        - mountPath: /app/venv
+          name: fastapi-pv
+      volumes:
+      - name: fastapi-pv
+        persistentVolumeClaim:
+          claimName: {{ .Values.fastapi.pvcName }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastapi-service
+spec:
+  selector:
+    app: fastapi
+  ports:
+    - protocol: TCP
+      port: {{ .Values.fastapi.port }}
+      targetPort: {{ .Values.fastapi.port }}
+  type: NodePort
+
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: fastapi-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi

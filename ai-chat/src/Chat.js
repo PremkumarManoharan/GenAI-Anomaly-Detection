@@ -14,7 +14,7 @@ const Chat = () => {
     setMessages((prevMessages) => [...prevMessages, userMessage]);
 
     try {
-      const response = await axios.post('/detect', { prompt: input });
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/detect`, { prompt: input });
       let aiMessage;
       if (response.data.warning) {
         aiMessage = { sender: 'ai', text: `Warning: ${response.data.warning}` };
