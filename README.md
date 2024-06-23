@@ -28,7 +28,7 @@ A step-by-step series of examples that tell you how to get a development environ
 
 1. **Clone the repository**
 
-    git clone https://github.com/yourusername/genai-anomaly-detection.git
+    git clone https://github.com/PremkumarManoharan/GenAI-Anomaly-Detection.git
     cd genai-anomaly-detection
 
 2. **Deploy with Helm**
