@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -66,7 +66,7 @@ func detectHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	responseData, err := ioutil.ReadAll(resp.Body)
+	responseData, err := io.ReadAll(io.Reader(resp.Body))
 	if err != nil {
 		http.Error(w, "Failed to read response from detection service", http.StatusInternalServerError)
 		return
