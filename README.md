@@ -4,6 +4,8 @@
 
 Welcome to the GenAI Anomaly-Detection System repository. This project is designed to enhance data security and user interaction by detecting sensitive information in user inputs and AI-generated responses. Built on a robust Google Kubernetes platform with Helm for efficient service deployment and management, it uses the TFAutoModelForTokenClassification for real-time anomaly detection.
 
+Link to excalidraw - https://excalidraw.com/#json=QePiQ2uN7QHVwsWYiUkGn,UOe7ldv93jbiBw0sWA5d5Q
+
 ## Features
 
 - **Real-time Anomaly Detection:** Utilizes machine learning to identify and block personal and location-specific data.
